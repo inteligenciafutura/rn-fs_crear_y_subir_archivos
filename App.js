@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import DocumentPicker from 'react-native-document-picker';
 
 export default class Tarjetas extends Component {
 
@@ -32,9 +33,9 @@ var uploadUrl = 'http://192.168.0.2/archivos/subirApi1.php';  // For testing pur
 var files = [
   {
     name: 'test1',
-    filename: 'test.txt',
-    filepath: RNFS.DocumentDirectoryPath + '/test.txt',
-    filetype: 'plain/txt'
+    filename: 'C2.PNG',
+    filepath: RNFS.DocumentDirectoryPath + '/C2.PNG',
+    filetype: 'image/PNG'
   }
 ];
 
@@ -77,6 +78,32 @@ RNFS.uploadFiles({
   });
 }
 
+subirArchivoDesdeDispositivo = async()=>{
+   // require the module
+var RNFS = require('react-native-fs');
+// Pick a single file
+try {
+  const res = await DocumentPicker.pick({
+    type: [DocumentPicker.types.images],
+  });
+  console.log(
+    res.uri,
+    res.type, // mime type
+    res.name,
+    res.size
+  );
+  alert(res.name);
+  const destPath = RNFS.DocumentDirectoryPath + '/'+res.name;
+  await RNFS.copyFile(res.uri, destPath);
+} catch (err) {
+  if (DocumentPicker.isCancel(err)) {
+    // User cancelled the picker, exit any dialogs or menus and move on
+  } else {
+    throw err;
+  }
+}
+}
+
 render(){
 return (
 <View style={styles.container}>
@@ -89,6 +116,12 @@ return (
 
 <TouchableOpacity onPress={()=> this.subirArchivo() }>
 <Text>Subir archivo desde un directorio local</Text>
+</TouchableOpacity>
+
+<Text></Text>
+
+<TouchableOpacity onPress={()=> this.subirArchivoDesdeDispositivo() }>
+<Text>Subir archivo desde un dispositivo</Text>
 </TouchableOpacity>
 
 </View>
